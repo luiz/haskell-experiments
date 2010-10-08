@@ -1,32 +1,16 @@
 module BowlingGame (
 	BowlingGame(..),
-	Frame,
-	points,
-	putFramesTogetherWithNextOnes,
-	pointsOfFrame,
-	thirdRoll) where
+	points) where
 
 import List
 
-data BowlingGame = BowlingGame [Frame]
-type Frame = [Roll]
+data BowlingGame = BowlingGame [Roll]
 type Roll = Int
 
-putFramesTogetherWithNextOnes :: [Frame] -> [(Frame, Frame, Frame)]
-putFramesTogetherWithNextOnes frames = zip3 frames ((tail frames) ++ [[0, 0]]) ((tail (tail frames)) ++ [[0, 0], [0, 0]])
+points2 lastFrame 10 = foldl (+) 0 lastFrame
+points2 (a:b:c:rest) rolls | a == 10         = 10 + b + c + (points2 (b:c:rest) (rolls + 1))
+points2 (a:b:c:rest) rolls | (a + b) == 10   = 10 + c + (points2 (c:rest) (rolls + 1))
+points2 (a:b:rest) rolls = a + b + (points2 rest (rolls + 1))
+points2 _ _ = 0
 
-thirdRoll ([10, 0], [10, 0], afterNext) = head afterNext
-thirdRoll ([10, 0], next, _) = head (tail next)
-thirdRoll ([a, b, c], _, _) = 0
-
-pins frame = foldl (+) 0 frame
-pointsOfFrame plays@([10, 0], next, afterNext) = 10 + (head next) + (thirdRoll plays)
-pointsOfFrame (frame, next, _) | (pins frame) == 10 = 10 + (head next)
-pointsOfFrame (frame, _, _) = (pins frame)
-
-pointsOfFrames frames = map pointsOfFrame (putFramesTogetherWithNextOnes frames)
-
-flatten :: [[a]] -> [a]
-flatten = foldl (++) []
-
-points (BowlingGame frames) = foldl (+) 0 (pointsOfFrames frames)
+points (BowlingGame rolls) = points2 rolls 1
