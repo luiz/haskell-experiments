@@ -3,7 +3,8 @@ module BowlingGame (
 	Frame,
 	points,
 	putFramesTogetherWithNextOnes,
-	pointsOfFrame) where
+	pointsOfFrame,
+	thirdRoll) where
 
 import List
 
@@ -14,8 +15,15 @@ type Roll = Int
 putFramesTogetherWithNextOnes :: [Frame] -> [(Frame, Frame, Frame)]
 putFramesTogetherWithNextOnes frames = zip3 frames ((tail frames) ++ [[0, 0]]) ((tail (tail frames)) ++ [[0, 0], [0, 0]])
 
-value frame = foldl (+) 0 frame
-pointsOfFrame (frame, next, afterNext) = (if (value frame) == 10 then (value frame) + (head next) else value frame) + (if (head frame) == 10 then (head (tail next)) else 0)
+thirdRoll ([10, 0], [10, 0], afterNext) = head afterNext
+thirdRoll ([10, 0], next, _) = head (tail next)
+thirdRoll ([a, b, c], _, _) = 0
+
+pins frame = foldl (+) 0 frame
+pointsOfFrame plays@([10, 0], next, afterNext) = 10 + (head next) + (thirdRoll plays)
+pointsOfFrame (frame, next, _) | (pins frame) == 10 = 10 + (head next)
+pointsOfFrame (frame, _, _) = (pins frame)
+
 pointsOfFrames frames = map pointsOfFrame (putFramesTogetherWithNextOnes frames)
 
 flatten :: [[a]] -> [a]

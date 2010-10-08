@@ -9,7 +9,9 @@ tests = TestList [testZeroScore,
 	testOnesScore,
 	testPutFramesTogetherWithNextOnes,
 	testPointsOfFrame,
-	testSpareScore]
+	testSpareScore,
+	testStrikeScore,
+	testPerfectGames]
 
 noGood = BowlingGame (replicate 10 [0, 0])
 onePins = BowlingGame (replicate 10 [1, 1])
@@ -34,6 +36,16 @@ testPutFramesTogetherWithNextOnes =
 	"Frames should be together with next ones in a single list cell" ~:
 	putFramesTogetherWithNextOnes [[5, 5], [6, 6], [7, 7]] ~?= [([5, 5], [6, 6], [7, 7]), ([6, 6], [7, 7], [0, 0]), ([7, 7], [0, 0], [0, 0])]
 
+testThirdRoll =
+	TestList[
+		"Third roll after a strike followed by a strike should be the first of the third frame" ~:
+		thirdRoll ([10, 0], [10, 0], [5, 3]) ~?= 5,
+		"Third roll after a strike followed by not a strike should be the second roll of the second frame" ~:
+		thirdRoll ([10, 0], [3, 6], [4, 2]) ~?= 6,
+		"Third roll after a strike followed by the last frame should be the second roll of that frame" ~:
+		thirdRoll ([10, 0], [10, 1, 3], [0, 0]) ~?= 1
+	]
+
 testPointsOfFrame =
 	TestList[
 		"Frame with no spare or strike should value the sum of rolls" ~:
@@ -47,18 +59,32 @@ testPointsOfFrame =
 	]
 
 testSpareScore =
-	"A spare should value 10 plus the next roll" ~:
-	points oneSpare ~?= 67
+	TestList[
+		"A spare should value 10 plus the next roll" ~:
+		points oneSpare ~?= 67,
+		"A spare followed by a spare should value 10 plus the first roll of the second spare" ~:
+		points twoConsecutiveSpares ~?= 76,
+		"A spare should be considered a normal play in the last frame" ~:
+		points spareInLastFrame ~?= 69
+	]
 
-{-(verifica (concat (repeat 9 [0 0]) [[0 0 0]]) (separa-frames jogo-vazio))-}
-{-(verifica (concat (repeat 9 [1 1]) [[1 1 0]]) (separa-frames jogo-de-uns))-}
-{-(verifica (concat [[10 0]] (repeat 8 [3 3]) [[3 3 0]]) (separa-frames jogo-com-um-strike))-}
-{-(verifica (concat [[10 0] [10 0]] (repeat 7 [3 3]) [[3 3 0]]) (separa-frames jogo-com-dois-strikes-seguidos))-}
-{-(verifica (concat (repeat 9 [3 3]) [[10 5 5]]) (separa-frames jogo-com-strike-no-primeiro-turn-do-ultimo-frame))-}
-{-(verifica (concat (repeat 9 [10 0]) [[10 10 10]]) (separa-frames jogo-perfeito))-}
+testStrikeScore =
+	TestList[
+		"A strike should value 10 plus the next two rolls" ~:
+		points oneStrike ~?= 70,
+		"A strike followed by a strike should value 20 plus the next roll after the second strike" ~:
+		points twoConsecutiveStrikes ~?= 87,
+		"A strike should be counted as a normal play in the last frame" ~:
+		points strikeFirstTurnOfLastFrame ~?= 74
+	]
 
-{-(verifica 10 (soma-dois-primeiros [5 5 5]))-}
-{-(verifica 15 (soma-dois-primeiros [10 5 5]))-}
+testPerfectGames =
+	TestList[
+		"A game with strikes in the 9 first frames and zero score in the last frame should value 240" ~:
+		points almostPerfect ~?= 240,
+		"A perfect game should value 300" ~:
+		points perfect ~?= 300
+	]
 
 {-(verifica 5 (pontos-do-ultimo-frame [2 3 0]))-}
 {-(verifica 15 (pontos-do-ultimo-frame [5 5 5]))-}
@@ -66,27 +92,5 @@ testSpareScore =
 {-(verifica 25 (pontos-do-ultimo-frame [10 10 5]))-}
 {-(verifica 30 (pontos-do-ultimo-frame [10 10 10]))-}
 
-{-(verifica 5 (segunda-jogada [[3 5]]))-}
-{-(verifica 0 (segunda-jogada [[8 0]]))-}
-{-(verifica 10 (segunda-jogada [[0 10]]))-}
-{-(verifica 3 (segunda-jogada [[10 0] [3 0]]))-}
-{-(verifica 5 (segunda-jogada [[10 5 1]]))-}
-{-(verifica 10 (segunda-jogada [[10 0] [10 0 10]]))-}
-
-{-(verifica 5 (pontos-do-frame [2 3] [[]]))-}
-{-(verifica 5 (pontos-do-frame [2 3] [[5 5]]))-}
-{-(verifica 15 (pontos-do-frame [5 5] [[5 5]]))-}
-{-(verifica 20 (pontos-do-frame [10 0] [[5 5]]))-}
-{-(verifica 30 (pontos-do-frame [10 0] [[10 10 10]]))-}
-{-(verifica 20 (pontos-do-frame [10 0] [[10 0 10]]))-}
-{-(verifica 28 (pontos-do-frame [10 0] [[10 0] [8 0]]))-}
-{-(verifica 30 (pontos-do-frame [10 0] [[10 0] [10 0]]))-}
-
-{-(verifica 67 (pontos jogo-com-um-spare))-}
-{-(verifica 70 (pontos jogo-com-um-strike))-}
-{-(verifica 76 (pontos jogo-com-dois-spares-seguidos))-}
-{-(verifica 87 (pontos jogo-com-dois-strikes-seguidos))-}
-{-(verifica 69 (pontos jogo-com-spare-no-ultimo-frame))-}
-{-(verifica 74 (pontos jogo-com-strike-no-primeiro-turn-do-ultimo-frame))-}
 {-(verifica 240 (pontos jogo-quase-perfeito))-}
 {-(verifica 300 (pontos jogo-perfeito))-}
