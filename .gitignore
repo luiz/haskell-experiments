@@ -1,3 +1,6 @@
 Grafo.hs
 GrafoTest.hs
 *.swp
+*.hi
+*.o
+Bytestring/giantprices.csv
