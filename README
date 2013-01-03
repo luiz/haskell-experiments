@@ -1,1 +1,6 @@
+Some stuff I've been programming in Haskell to learn the language.
+
+All the code here is under Apache License unless otherwise stated in the source code.
+
+About the bowling game:
 There is another branch that does not use separated frames as input. It's quite simpler and it's not my idea.
