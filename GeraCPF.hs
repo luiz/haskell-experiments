@@ -37,6 +37,4 @@ montaCpf n =
     in
         concat $ map show $ principal ++ [d1, d2]
 
-main = do
-    (n:_) <- getArgs
-    print $ montaCpf (read n)
+main = interact $ montaCpf . read
