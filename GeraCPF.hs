@@ -9,11 +9,8 @@ completaCom elem tamanho lista
     | length lista >= tamanho = lista
     | otherwise               = elem : (completaCom elem (tamanho - 1) lista)
 
-multiplica2 :: Num a => (a, a) -> a
-multiplica2 (a, b) = a * b
-
 somaMultiplicandoPor :: Num a => [a] -> [a] -> a
-somaMultiplicandoPor l1 l2 = sum $ map multiplica2 $ zip l1 l2
+somaMultiplicandoPor l1 l2 = sum $ zipWith (*) l1 l2
 
 dv :: [Int] -> [Int] -> Int
 dv mascara digitos =
@@ -40,6 +37,4 @@ montaCpf n =
     in
         concat $ map show $ principal ++ [d1, d2]
 
-main = do
-    (n:_) <- getArgs
-    print $ montaCpf (read n)
+main = interact $ montaCpf . read
